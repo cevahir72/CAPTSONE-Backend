@@ -41,6 +41,12 @@ INSTALLED_APPS = [
     #apps
     'users',
     'blog',
+    #3rd party installments
+    'rest_framework.authtoken',
+    "rest_framework",
+    'dj_rest_auth',
+    "drf_yasg",
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
