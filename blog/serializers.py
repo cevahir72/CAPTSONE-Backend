@@ -22,7 +22,7 @@ class LikeSerializer(serializers.ModelSerializer):
         model= Like
         fields = ("post_id", "user_id" , )
         
-class PostView(serializers.ModelSerializer):
+class PostViewSerializer(serializers.ModelSerializer):
     post_id =serializers.IntegerField(write_only=True, required=False)
     user_id =serializers.IntegerField(write_only=True, required=False)
     
@@ -30,7 +30,7 @@ class PostView(serializers.ModelSerializer):
         model= PostView
         fields = ("post_id", "user_id" , )
         
-class Post(serializers.ModelSerializer):
+class PostSerializer(serializers.ModelSerializer):
     categories= CategorySerializer(many=True, write_only=True)
     comments = CommentSerializer (many=True, write_only=True)
     comment_count = serializers.SerializerMethodField(read_only=True)
@@ -45,6 +45,8 @@ class Post(serializers.ModelSerializer):
     
     def get_like_count(self, obj):
         return obj.like.count()
+    
+
         
 
     
