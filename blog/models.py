@@ -31,7 +31,7 @@ class Post(models.Model):
         ('Django', 'Django'),
         ('CSS', 'CSS')
     ]
-    category= models.ForeignKey(Category,on_delete=models.PROTECT, choices="POST_CATEGORY_CHOICES")
+    category= models.CharField(max_length=20, choices="POST_CATEGORY_CHOICES")
     # one-->many ilişkisi
     slug =models.SlugField(blank=True, unique=True)   # "how-to-learn-django" aralarına -  koyuyor
     
