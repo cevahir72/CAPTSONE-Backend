@@ -1,25 +1,81 @@
-from django.shortcuts import render
-from blog.models import Post
-from blog.serializers import PostSerializer,LikeSerializer,CommentSerializer,PostViewSerializer
-from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics
-from .permissions import IsStuffOrReadOnly
+from rest_framework import generics, status
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
+
+from .models import Comment, Like, Post, PostView
+from .pagination import CursorPagi, Pagination
+from .permissions import IsOwnerOrReadOnly
+from .serializers import (CommentSerializer, LikeSerializer, PostSerializer,
+                          PostViewSerializer)
 
 
 
-class PostListView(generics.ListAPIView):
+class PostListView(generics.ListCreateAPIView):
     queryset= Post.objects.all()
     serializer_class = PostSerializer
-    
-    
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    pagination_class = Pagination
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+       
+    def create(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+        return Response({
+            'status': status.HTTP_200_OK,
+            'message': 'Post created!'
+        })
         
-class DetailView(generics.ListAPIView):
+        
+class DetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset=Post.objects.all()
     serilizer_class = PostSerializer
-    permission_classes = (IsStuffOrReadOnly,)
+    lookup_field = 'id'
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
+    
+    def put(self, request, *args, **kwargs):
+        self.update(request, *args, **kwargs)
+        return Response({
+            "status": status.HTTP_200_OK,
+            "message":"Post Updated!"
+        })
+    
+    def delete(self, request, *args, **kwargs):
+        self.destroy(request, *args, **kwargs)
+        content = {'message': 'Post deleted!'}
+        return Response(content, status=status.HTTP_200_OK)
+
+class CommentView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    
+    def get_queryset(self):
+        post_id = self.kwargs["id"]
+        return Comment.objects.filter(post=post_id)
+    
+    def create(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+        return Response({
+            'status': status.HTTP_200_OK,
+            'message': 'Comment added successfully!'
+        })
+
+class LikeView(generics.ListCreateAPIView):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        post_id = self.kwargs['id']
+        return Like.objects.filter(post=post_id)
 
 
+class PostViewList(generics.ListCreateAPIView):
+    queryset = PostView.objects.all()
+    serializer_class = PostViewSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
+    def get_queryset(self):
+        post_id = self.kwargs['id']
+        return PostView.objects.filter(post=post_id)
+    
+    
