@@ -20,7 +20,7 @@ class Post(models.Model):
     image= models.ImageField(upload_to=user_directory_path, blank=True) 
     publish_date= models.DateTimeField(auto_now_add=True)
     last_updated=models.DateTimeField(auto_now=True)
-    author=models.ForeignKey(User, on_delete=models.CASCADE)  
+    user=models.ForeignKey(User, on_delete=models.CASCADE)  
     #User silinirse post da silinsin
     POST_CATEGORY_CHOICES = [
         ('Javascript', 'Javascript'),
@@ -31,12 +31,12 @@ class Post(models.Model):
         ('Django', 'Django'),
         ('CSS', 'CSS')
     ]
-    category= models.CharField(max_length=20, choices=POST_CATEGORY_CHOICES)
+    category= models.CharField(max_length=20, choices=POST_CATEGORY_CHOICES, default="REACT-JS")
     # one-->many ilişkisi
     slug =models.SlugField(blank=True, unique=True)   # "how-to-learn-django" aralarına -  koyuyor
     
     def __str__(self):
-        return f"{self.user} {self.title} {self.content}"
+        return f"{self.user} {self.title}"
     
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name ="comments")  # user silindiği zaman ona ait commentler de silinsin
@@ -47,7 +47,7 @@ class Comment(models.Model):
     
     
     def __str__(self):
-        return f"{self.user} {self.content}"
+        return f"{self.user} {self.title}"
 
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # user silindiği zaman ona ait likelar  da silinsin
