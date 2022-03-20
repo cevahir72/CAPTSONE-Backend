@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
-
+from rest_framework.decorators import api_view
 from .serializers import RegisterSerializer
 
 
@@ -26,3 +26,9 @@ class RegisterAPI(CreateAPIView):
         #!----------------------------------------
         #! token oluşturduktan sonra headers ile göndermemiz gerekiyor
         return Response(data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+@api_view(['POST'])
+def log_out(request):
+    request.user.auth_token.delete()
+    return Response({"message": "logout"})
