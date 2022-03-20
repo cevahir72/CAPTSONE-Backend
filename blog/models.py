@@ -60,7 +60,6 @@ class Like(models.Model):
 class PostView(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE) 
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name = "views")  
-    time_stamp = models.DateTimeField(auto_now_add=True)
     createdDate = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
