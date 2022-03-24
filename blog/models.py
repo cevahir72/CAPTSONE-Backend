@@ -18,8 +18,8 @@ class Post(models.Model):
     title= models.CharField(max_length=100)
     content= models.TextField(max_length=1000)
     image= models.ImageField(upload_to=user_directory_path, blank=True) 
-    publish_date= models.DateTimeField(auto_now_add=True)
-    last_updated=models.DateTimeField(auto_now=True)
+    createdDate=models.DateTimeField(auto_now_add=True)
+    updatedDate=models.DateTimeField(auto_now=True)
     user=models.ForeignKey(User, on_delete=models.CASCADE)  
     #User silinirse post da silinsin
     POST_CATEGORY_CHOICES = [
