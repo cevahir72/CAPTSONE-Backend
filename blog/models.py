@@ -1,67 +1,61 @@
-from django.db import models
+from unicodedata import category
+
 from django.contrib.auth.models import User
+from django.db import models
+
 
 # Create your models here.
-
-def user_directory_path(instance, filename):
-    return 'blog/{0}/{1}'.format(instance.author.id, filename)
-
-
-
-
 class Post(models.Model):
-    OPTIONS= [
-        ('d', 'Draft'),
-        ('p', 'Published')
-    ]
-    status = models.CharField(max_length=10, choices=OPTIONS, default='d')  # Yukarıdaki OPTIONS daki verileriş Dropdown menu yapıyor
-    title= models.CharField(max_length=100)
-    content= models.TextField(max_length=1000)
-    image= models.ImageField(upload_to=user_directory_path, blank=True) 
-    createdDate=models.DateTimeField(auto_now_add=True)
-    updatedDate=models.DateTimeField(auto_now=True)
-    user=models.ForeignKey(User, on_delete=models.CASCADE)  
-    #User silinirse post da silinsin
-    POST_CATEGORY_CHOICES = [
-        ('Javascript', 'Javascript'),
-        ('Python', 'Python'),
-        ('SAAS', 'SAAS'),
-        ('HTML', 'HTML'),
-        ('REACT-JS', 'REACT-JS'),
-        ('Django', 'Django'),
-        ('CSS', 'CSS')
-    ]
-    category= models.CharField(max_length=20, choices=POST_CATEGORY_CHOICES, default="REACT-JS")
-    # one-->many ilişkisi
-    slug =models.SlugField(blank=True, unique=True)   # "how-to-learn-django" aralarına -  koyuyor
-    
-    def __str__(self):
-        return f"{self.user} {self.title}"
-    
-class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name ="comments")  # user silindiği zaman ona ait commentler de silinsin
-    post = models.ForeignKey(Post, on_delete= models.CASCADE)
-    time_stamp = models.DateTimeField(auto_now_add=True)
-    content= models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    content = models.TextField(max_length=1000)
+    image = models.CharField(max_length=1000)
     createdDate = models.DateTimeField(auto_now_add=True)
-    
-    
+    updatedDate = models.DateTimeField(auto_now=True)
+    POST_CATEGORY_CHOICES = [
+        ('General', 'General'),
+        ('Nature', 'Nature'),
+        ('Article', 'Article'),
+        ('Entertainment', 'Entertainment'),
+        ('Health', 'Health'),
+        ('Science', 'Science'),
+        ('Sports', 'Sports'),
+        ('Sowftware','Sowftware')
+    ]
+    category = models.CharField(
+        max_length=20, choices=POST_CATEGORY_CHOICES, default='General')
+
     def __str__(self):
-        return f"{self.user} {self.title}"
+        return f"{self.user} {self.title} {self.content}"
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField(max_length=1000)
+    createdDate = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} {self.content}"
+
 
 class Like(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # user silindiği zaman ona ait likelar  da silinsin
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name = "likes")
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     createdDate = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return f"{self.user} {self.post}"
-    
+
+
 class PostView(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE) 
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name = "views")  
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name='views')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     createdDate = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return f"{self.user} {self.post}"
 
